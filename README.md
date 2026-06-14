@@ -5,7 +5,7 @@ A modern AI-powered resume analyzer built with React Router 7, Puter.js, and Tai
 ## Features
 
 -   📄 **PDF Analysis**: Convert PDF resumes to images for AI processing.
--   🤖 **AI Powered**: Utilizes Puter.js AI (Claude 3.7 Sonnet) for resume evaluation and feedback.
+-   🤖 **AI Powered**: Utilizes Puter.js AI (Claude 3.5 Sonnet) for resume evaluation and feedback.
 -   📊 **ATS Scoring**: Calculate ATS compatibility scores based on job descriptions.
 -   📁 **Puter Integration**: Leverages Puter.js for authentication, cloud storage (FS), and Key-Value (KV) storage.
 -   ⚡ **Modern Stack**: Built with React Router 7, TypeScript, and Tailwind CSS 4.

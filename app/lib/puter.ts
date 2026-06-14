@@ -321,10 +321,29 @@ export const usePuterStore = create<PuterStore>((set, get) => {
             setError("Puter.js not available");
             return;
         }
-        // return puter.ai.chat(prompt, imageURL, testMode, options);
-        return puter.ai.chat(prompt, imageURL, testMode, options) as Promise<
-            AIResponse | undefined
-        >;
+
+        try {
+            console.log("Puter AI Chat Request:", { prompt, imageURL, testMode, options });
+            const startTime = Date.now();
+            
+            // Ensure we use the correct model if options are provided
+            const chatOptions = typeof imageURL === 'object' ? imageURL : options;
+            if (chatOptions && (chatOptions.model === "claude-3-7-sonnet" || !chatOptions.model)) {
+                chatOptions.model = "claude-sonnet-4-6";
+            }
+
+            const response = await (puter.ai.chat(prompt, imageURL, testMode, options) as Promise<
+                AIResponse | undefined
+            >);
+            
+            const duration = Date.now() - startTime;
+            console.log(`Puter AI Chat Response (${duration}ms):`, response);
+            return response;
+        } catch (error) {
+            console.error("Puter AI Chat Error:", error);
+            setError(`AI Chat failed: ${error instanceof Error ? error.message : String(error)}`);
+            throw error;
+        }
     };
 
     const feedback = async (path: string, message: string) => {
@@ -334,24 +353,36 @@ export const usePuterStore = create<PuterStore>((set, get) => {
             return;
         }
 
-        return puter.ai.chat(
-            [
-                {
-                    role: "user",
-                    content: [
-                        {
-                            type: "file",
-                            puter_path: path,
-                        },
-                        {
-                            type: "text",
-                            text: message,
-                        },
-                    ],
-                },
-            ],
-            { model: "claude-3-7-sonnet" }
-        ) as Promise<AIResponse | undefined>;
+        try {
+            console.log("Puter AI Feedback Request for path:", path);
+            const startTime = Date.now();
+            const response = await (puter.ai.chat(
+                [
+                    {
+                        role: "user",
+                        content: [
+                            {
+                                type: "file",
+                                puter_path: path,
+                            },
+                            {
+                                type: "text",
+                                text: message,
+                            },
+                        ],
+                    },
+                ],
+                { model: "claude-sonnet-4-6" }
+            ) as Promise<AIResponse | undefined>);
+            
+            const duration = Date.now() - startTime;
+            console.log(`Puter AI Feedback Response (${duration}ms):`, response);
+            return response;
+        } catch (error) {
+            console.error("Puter AI Feedback Error:", error);
+            setError(`AI Feedback failed: ${error instanceof Error ? error.message : String(error)}`);
+            throw error;
+        }
     };
 
     const img2txt = async (image: string | File | Blob, testMode?: boolean) => {
@@ -360,7 +391,18 @@ export const usePuterStore = create<PuterStore>((set, get) => {
             setError("Puter.js not available");
             return;
         }
-        return puter.ai.img2txt(image, testMode);
+        try {
+            console.log("Puter AI img2txt Request");
+            const startTime = Date.now();
+            const response = await puter.ai.img2txt(image, testMode);
+            const duration = Date.now() - startTime;
+            console.log(`Puter AI img2txt Response (${duration}ms):`, response);
+            return response;
+        } catch (error) {
+            console.error("Puter AI img2txt Error:", error);
+            setError(`AI img2txt failed: ${error instanceof Error ? error.message : String(error)}`);
+            throw error;
+        }
     };
 
     const getKV = async (key: string) => {
